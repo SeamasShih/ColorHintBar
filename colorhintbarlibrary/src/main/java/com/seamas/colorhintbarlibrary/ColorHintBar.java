@@ -79,6 +79,7 @@ public class ColorHintBar extends View {
         if (itemAmount < 1)
             itemAmount = 1;
         this.itemAmount = itemAmount;
+        setItemWidth();
         postInvalidate();
     }
 
@@ -107,7 +108,11 @@ public class ColorHintBar extends View {
         postInvalidate();
     }
 
-    public void setSiteShift(int site, float shift) {
+    public void setSiteShift(int max, int site, float shift) {
+        if (max < 1)
+            max = 1;
+        this.itemAmount = max;
+        setItemWidth();
         this.site = site;
         this.shift = shift;
         refreshTimer();
@@ -118,8 +123,7 @@ public class ColorHintBar extends View {
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int i, float v, int i1) {
-                setItemAmount(viewPager.getAdapter().getCount());
-                setSiteShift(i, v);
+                setSiteShift(viewPager.getAdapter().getCount(),i, v);
             }
 
             @Override
