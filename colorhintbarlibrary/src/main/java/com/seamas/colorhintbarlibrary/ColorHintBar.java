@@ -158,7 +158,7 @@ public class ColorHintBar extends View {
         }
     }
 
-    private void setTimerTime(long time) {
+    public void setTimerTime(long time) {
         if (time < 0) {
             isVanishMode = false;
             refreshTimer();
