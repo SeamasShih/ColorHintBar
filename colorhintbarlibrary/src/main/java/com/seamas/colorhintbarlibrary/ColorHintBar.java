@@ -163,6 +163,9 @@ public class ColorHintBar extends View {
             isVanishMode = false;
         } else {
             timer.setDuration(time);
+            animatorSet.cancel();
+            animatorSet = new AnimatorSet();
+            animatorSet.playSequentially(timer,vanish);
         }
         refreshTimer();
     }
