@@ -1,5 +1,6 @@
 package com.seamas.colorhintbarlibrary;
 
+import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
@@ -21,8 +22,9 @@ public class ColorHintBar extends View {
     private Paint bgPaint = new Paint();
     private Paint hintPaint = new Paint();
 
-    private Timer timer = new Timer();
     private ValueAnimator vanish = ValueAnimator.ofInt(255, 0);
+    private ValueAnimator timer = ValueAnimator.ofFloat(0, 100);
+    private AnimatorSet animatorSet = new AnimatorSet();
     private boolean isVanishMode = true;
 
     public ColorHintBar(Context context, @Nullable AttributeSet attrs) {
@@ -37,7 +39,10 @@ public class ColorHintBar extends View {
             postInvalidate();
         });
 
-        timer.start();
+        timer.setDuration(1500);
+
+        animatorSet.play(timer).before(vanish);
+        animatorSet.start();
     }
 
     @Override
@@ -123,7 +128,7 @@ public class ColorHintBar extends View {
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int i, float v, int i1) {
-                setSiteShift(viewPager.getAdapter().getCount(),i, v);
+                setSiteShift(viewPager.getAdapter().getCount(), i, v);
             }
 
             @Override
@@ -143,66 +148,22 @@ public class ColorHintBar extends View {
     }
 
     private void refreshTimer() {
-        if (!isVanishMode) {
-            if (timer.isStart)
-                timer.isEnd = true;
-        } else if (timer.isEnd) {
-            long time = timer.time;
-            timer = new Timer();
-            timer.time = time;
-            timer.start();
-        } else if (timer.isStart) {
-            timer.starTime = System.currentTimeMillis();
-        } else {
-            timer.start();
+        if (isVanishMode) {
+            animatorSet.cancel();
+            animatorSet.start();
+        }else {
+            animatorSet.cancel();
+            bgPaint.setAlpha(255);
+            postInvalidate();
         }
     }
 
     public void setTimerTime(long time) {
         if (time < 0) {
             isVanishMode = false;
-            refreshTimer();
-            bgPaint.setAlpha(255);
-            postInvalidate();
         } else {
-            if (timer.isEnd) {
-                timer = new Timer();
-                timer.time = time;
-            } else {
-                timer.time = time;
-            }
+            timer.setDuration(time);
         }
-    }
-
-    private class Timer extends Thread {
-        long time = 1500;
-        long starTime = System.currentTimeMillis();
-        boolean isEnd = false;
-        boolean isStart = false;
-
-        @Override
-        public void run() {
-            beginning();
-
-            while (true) {
-                if (isEnd)
-                    break;
-                else if (System.currentTimeMillis() > starTime + time) {
-                    doing();
-                    break;
-                }
-            }
-        }
-
-        private void beginning() {
-            isStart = true;
-            bgPaint.setAlpha(255);
-            postInvalidate();
-        }
-
-        private void doing() {
-            isEnd = true;
-            ((Activity) getContext()).runOnUiThread(() -> vanish.start());
-        }
+        refreshTimer();
     }
 }
