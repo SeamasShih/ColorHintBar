@@ -107,11 +107,19 @@ public class ColorHintBar extends View {
         postInvalidate();
     }
 
-    public void setViewConnectedPager(ViewPager viewPager){
+    public void setSiteShift(int site, float shift) {
+        this.site = site;
+        this.shift = shift;
+        refreshTimer();
+        postInvalidate();
+    }
+
+    public void setViewConnectedPager(ViewPager viewPager) {
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int i, float v, int i1) {
-
+                setItemAmount(viewPager.getAdapter().getCount());
+                setSiteShift(i, v);
             }
 
             @Override
@@ -121,12 +129,6 @@ public class ColorHintBar extends View {
 
             @Override
             public void onPageScrollStateChanged(int i) {
-
-            }
-        });
-        viewPager.addOnAdapterChangeListener(new ViewPager.OnAdapterChangeListener() {
-            @Override
-            public void onAdapterChanged(@NonNull ViewPager viewPager, @Nullable PagerAdapter pagerAdapter, @Nullable PagerAdapter pagerAdapter1) {
 
             }
         });
